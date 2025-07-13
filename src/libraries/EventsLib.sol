@@ -29,6 +29,17 @@ library EventsLib {
     /// @param lltv The LLTV that was enabled.
     event EnableLltv(uint256 lltv);
 
+    /// @notice Emitted when setting whether allow permissionless liquidation.
+    /// @dev newly added
+    /// @param newAllowLiquidation The new allow permissionless liquidation status.
+    event SetAllowLiquidation(bool newAllowLiquidation);
+
+    /// @notice Emitted when setting a whitelisted liquidator when permissionless liquidation is not allowed.
+    /// @dev newly added
+    /// @param liquidator The liquidator to be whitelisted or de-whitelisted.
+    /// @param isWhiteList The whitelist status.
+    event SetLiquidator(address liquidator, bool isWhiteList);
+
     /// @notice Emitted when creating a market.
     /// @param id The market id.
     /// @param marketParams The market that was created.

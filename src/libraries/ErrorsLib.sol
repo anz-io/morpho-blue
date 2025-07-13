@@ -77,4 +77,8 @@ library ErrorsLib {
 
     /// @notice Thrown when the maximum uint128 is exceeded.
     string internal constant MAX_UINT128_EXCEEDED = "max uint128 exceeded";
+
+    /// @notice Thrown when permissionless liquidation is not allowed and the caller is not a whitelisted liquidator.
+    /// @dev newly added
+    string internal constant NOT_LIQUIDATOR = "not whitelisted liquidator";
 }

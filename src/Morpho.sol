@@ -68,6 +68,10 @@ contract Morpho is IMorphoStaticTyping {
     mapping(address => uint256) public nonce;
     /// @inheritdoc IMorphoStaticTyping
     mapping(Id => MarketParams) public idToMarketParams;
+    /// @dev newly added: whether allow permissionless liquidation
+    bool public allowLiquidation;
+    /// @dev newly added: permissioned liquidators
+    mapping(address => bool) public isLiquidator;
 
     /* CONSTRUCTOR */
 
@@ -142,6 +146,22 @@ contract Morpho is IMorphoStaticTyping {
         feeRecipient = newFeeRecipient;
 
         emit EventsLib.SetFeeRecipient(newFeeRecipient);
+    }
+
+    /// @dev newly added: set whether allow permissionless liquidation
+    function setAllowLiquidation(bool newAllowLiquidation) external onlyOwner {
+        allowLiquidation = newAllowLiquidation;
+
+        emit EventsLib.SetAllowLiquidation(newAllowLiquidation);
+    }
+
+    /// @dev newly added: set a whitelisted liquidator when permissionless liquidation is not allowed
+    function setLiquidator(address liquidator, bool isWhiteList) external onlyOwner {
+        require(liquidator != address(0), ErrorsLib.ZERO_ADDRESS);
+
+        isLiquidator[liquidator] = isWhiteList;
+
+        emit EventsLib.SetLiquidator(liquidator, isWhiteList);
     }
 
     /* MARKET CREATION */
@@ -354,6 +374,7 @@ contract Morpho is IMorphoStaticTyping {
         Id id = marketParams.id();
         require(market[id].lastUpdate != 0, ErrorsLib.MARKET_NOT_CREATED);
         require(UtilsLib.exactlyOneZero(seizedAssets, repaidShares), ErrorsLib.INCONSISTENT_INPUT);
+        require(allowLiquidation || isLiquidator[msg.sender], ErrorsLib.NOT_LIQUIDATOR);
 
         _accrueInterest(marketParams, id);
 
